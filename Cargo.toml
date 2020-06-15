@@ -8,4 +8,5 @@ edition = "2018"
 
 [dependencies]
 fltk = { git = "https://github.com/MoAlyousef/fltk-rs" }
-reqwest = "0.10.6"
+image = "0.23.5"
+rust-embed="0.3.5"
