@@ -1,4 +1,15 @@
-use fltk::{app, button::*, frame::*, window::*, image::*};
+use fltk::{
+    app,
+    button::*,
+    frame::*,
+    group::*,
+    input::*,
+    menu::*,
+    output::*,
+    valuator::*,
+    window::*,
+    image::*
+};
 use std::error::Error;
 use std::path::PathBuf;
 use std::collections::HashMap;
@@ -78,6 +89,8 @@ struct Enemigo<'a> {
     //Entre defensa, ataque y velocidad, no pueden exceder lo 10 puntos.
 }
 
+
+
 struct Entrenador<'a> {
     // The 'a defines a lifetime
     nombre: &'a str,
@@ -99,9 +112,23 @@ static entrenadorPlayer: Entrenador = Entrenador {
 
 static inGlobal: i32 = 5;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn draw_gallery() {
 
-    println!("{}", inGlobal);
+}
+
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let app = app::App::default();
+
+    let (screen_width, screen_height) = fltk::app::screen_size();
+    let mut wind = Window::new(
+        (screen_width / 2.0 - 250.0) as i32,
+        (screen_height / 2.0 - 200.0) as i32,
+        740,
+        400,
+        "Fakemon Battle Center",
+    );
+
 
     let mut latigo = Habilidad {
 
@@ -183,10 +210,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     };
 
-    // Vettel
-
-    let mut pokemon1 =  Fakemon { 
-
+    // FAKEMON
+    let mut fake =  Fakemon { 
         nombre : "Vettel",
         codigo : 1,
         hp : 1000,
@@ -203,177 +228,142 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     };
 
-    let mut pokemon2 =  Fakemon { 
+    // ENEMIGO
+    let mut enemigo =  Enemigo { 
 
-        nombre : "Raikkonen",
-        codigo : 4,
+        nombre : "Stroll",
         hp : 1000,
-        defn : 5,
+        defn : 3,
         atk : 4,
         nivel : 1,
-        velocidad : 1,
-        experiencia : 0,
-        tipo : "Agua",
-        imagen : "raikkonen.png",
-        habilidad1 : agilidad,
-        habilidad2 : salpicar,
-        habilidad3 : rugido
-
+        velocidad : 3,
+        tipo : "fuego",
     };
 
-    let mut pokemon3 =  Fakemon { 
-
-        nombre : "Albon",
-        codigo : 7,
-        hp : 1000,
-        defn : 2,
-        atk : 4,
-        nivel : 1,
-        velocidad : 4,
-        experiencia : 0,
-        tipo : "Planta",
-        imagen : "albon.png",
-        habilidad1 : latigo,
-        habilidad2 : corte_hoja,
-        habilidad3 : armazon
-
-    };
-
+    let tab = Tabs::new(10, 10, 650 - 20, 400 - 20, "");
     
+    let grp1 = Group::new(10, 35, 650 - 20, 400 - 45, "Principal");
+    
+    let _frame = Frame::new(270, 335, 90, 30, "Examples!");
 
-    /*fn comprar(dinero){
+    let mut frame_back = Frame::new(35, 35, 600, 400, "");
+    let mut image_back = SharedImage::load(&PathBuf::from("res/fondos/title_screen.png"))?;
+    image_back.scale(700, 505, true, true);
+    frame_back.set_image(&image_back);
 
-        println!("Bienvenido a la tienda, ¿Que deseas comprar?);
-        
-
-    } */
-
-    println!("\n{}", pokemon1.nombre);
-
-    //VENTANA PRINCIPAL
-
-    let app = app::App::default();//.set_scheme(AppScheme::Gleam);
-    let mut wind = Window::new(200, 200, 600, 500, "Fakemon Battle Center");
-
-    let mut frame = Frame::new(50, 50, 100, 300, "");
+    let mut frame = Frame::new(70, 70, 100, 300, "");
     let mut image = SharedImage::load(&PathBuf::from("res/vettel.png"))?;
     image.scale(200, 200, true, true);
     frame.set_image(&image);
 
-    // LOGO
-    let mut frameLogo = Frame::new(250, -100, 100, 300, "");
-    let mut imageLogo = SharedImage::load(&PathBuf::from("res/logo.png"))?;
-    imageLogo.scale(200, 200, true, true);
-    frameLogo.set_image(&imageLogo);
+    let mut frame_f2 = Frame::new(270, 70, 100, 300, "");
+    let mut image_f2 = SharedImage::load(&PathBuf::from("res/raikkonen.png"))?;
+    image_f2.scale(200, 200, true, true);
+    frame_f2.set_image(&image_f2);
+
+    let mut frame_f3 = Frame::new(470, 70, 100, 300, "");
+    let mut image_f3 = SharedImage::load(&PathBuf::from("res/albon.png"))?;
+    image_f3.scale(200, 200, true, true);
+    frame_f3.set_image(&image_f3);
 
     // STATS DE ENTRENADOR
     // DINERO
-    let mut frameLogo = Frame::new(300, -100, 300, 300, "");
+    let mut frameLogo = Frame::new(350, -100, 300, 300, "");
     let mut imageLogo = SharedImage::load(&PathBuf::from("res/iconos/money.png"))?;
     imageLogo.scale(30, 30, true, true);
     frameLogo.set_image(&imageLogo);
 
     // MEDALLAS
-    let mut frameLogo = Frame::new(350, -100, 300, 300, "");
+    let mut frameLogo = Frame::new(400, -100, 300, 300, "");
     let mut imageLogo = SharedImage::load(&PathBuf::from("res/iconos/potions.png"))?;
     imageLogo.scale(30, 30, true, true);
     frameLogo.set_image(&imageLogo);
-
     
-
-
-    //STATS EN SELECCION POK1
-
-    let mut frame = Frame::new(50, 180, 100, 300, &format!("HP: {}",pokemon1.hp));
-    let mut frame = Frame::new(50, 200, 100, 300, &format!("DEF: {}",pokemon1.defn));
-    let mut frame = Frame::new(50, 220, 100, 300, &format!("ATK: {}",pokemon1.atk));
-    let mut frame = Frame::new(50, 240, 100, 300, &format!("ASPD: {}",pokemon1.velocidad));
-    let mut frame = Frame::new(50, 260, 100, 300, &format!("Tipo: {}",pokemon1.tipo));
-
-
-    let mut frame_f2 = Frame::new(250, 50, 100, 300, "");
-    let mut image_f2 = SharedImage::load(&PathBuf::from("res/raikkonen.png"))?;
-    image_f2.scale(200, 200, true, true);
-    frame_f2.set_image(&image_f2);
-
-    //STATS EN SELECCION POK2
-
-    let mut frame2 = Frame::new(250, 180, 100, 300, &format!("HP: {}",pokemon2.hp));
-    let mut frame2 = Frame::new(250, 200, 100, 300, &format!("DEF: {}",pokemon2.defn));
-    let mut frame2 = Frame::new(250, 220, 100, 300, &format!("ATK: {}",pokemon2.atk));
-    let mut frame2 = Frame::new(250, 240, 100, 300, &format!("ASPD: {}",pokemon2.velocidad));
-    let mut frame = Frame::new(250, 260, 100, 300, &format!("Tipo: {}",pokemon2.tipo));
-
-    let mut frame_f3 = Frame::new(450, 50, 100, 300, "");
-    let mut image_f3 = SharedImage::load(&PathBuf::from("res/albon.png"))?;
-    image_f3.scale(200, 200, true, true);
-    frame_f3.set_image(&image_f3);
+    grp1.end();
     
-    
-    //STATS EN SELECCION POK3
+    let mut grp2 = Group::new(10, 35, 650 - 30, 400 - 25, "Batalla");
 
-    let mut frame3 = Frame::new(450, 180, 100, 300, &format!("HP: {}",pokemon3.hp));
-    let mut frame3 = Frame::new(450, 200, 100, 300, &format!("DEF: {}",pokemon3.defn));
-    let mut frame3 = Frame::new(450, 220, 100, 300, &format!("ATK: {}",pokemon3.atk));
-    let mut frame3 = Frame::new(450, 240, 100, 300, &format!("ASPD: {}",pokemon3.velocidad));
-    let mut frame = Frame::new(450, 260, 100, 300, &format!("Tipo: {}",pokemon3.tipo));
+    let mut frame_back = Frame::new(0, -30, 650, 400, "");
+    let mut image_back = SharedImage::load(&PathBuf::from("res/fondos/jungle.jpg"))?;
+    image_back.scale(650, 530, true, true);
+    frame_back.set_image(&image_back);
 
-    frame.set_color(Color::from_rgb(73, 235, 23));
+    let mut frame_you = Frame::new(50, 50, 100, 200, "");
+    let mut image_you = SharedImage::load(&PathBuf::from("res/".to_string() + &fake.imagen.to_string()))?;
+    image_you.scale(200, 200, true, true);
+    frame_you.set_image(&image_you);
 
-    let mut but = Button::new(50, 240, 80, 40, "Vettel");
-    but.set_color(Color::from_rgb(237, 14, 14));
-    //but.set_font(Font::TimesItalic);
-    let mut but2 = Button::new(250, 240, 80, 40, "Raikkonen");
-    but2.set_color(Color::from_rgb(15, 242, 238));
-    let mut but3 = Button::new(450, 240, 80, 40, "Albon");
-    but3.set_color(Color::from_rgb(73, 235, 23));
+    let mut frame_text_box = Frame::new(40, 60, 530, 400, "");
+    let mut image_text_box = SharedImage::load(&PathBuf::from("res/text_box.png"))?;
+    image_text_box.scale(250, 250, true, true);
+    frame_text_box.set_image(&image_text_box);
+
+    let mut randomEnemy = readPokes("str");
+
+    let mut frame_enemy = Frame::new(50, 50, 900, 200, "");
+    let mut image_enemy = SharedImage::load(&PathBuf::from("res/fakemons/".to_string() + &randomEnemy.to_string()))?;
+    image_enemy.scale(200, 200, true, true);
+    frame_enemy.set_image(&image_enemy);
+
+    let mut frame_enemy_health = Frame::new(50, 150, 900, 200, "");
+    let mut image_enemy_health = SharedImage::load(&PathBuf::from("res/iconos/healthbar.png"))?;
+    image_enemy_health.scale(90, 90, true, true);
+    frame_enemy_health.set_image(&image_enemy_health);
+
+    // BOTONES DE FAKEMON
+    let mut but_p = Button::new(50, 200, 80, 40, fake.habilidad1.nombre);
+    let mut but_p2 = Button::new(50, 250, 80, 40, fake.habilidad2.nombre);
+    let mut but_p3 = Button::new(50, 300, 80, 40, fake.habilidad3.nombre);
+    but_p.set_color(Color::from_rgb(3, 110, 250));
+    but_p2.set_color(Color::from_rgb(3, 110, 250));
+    but_p3.set_color(Color::from_rgb(3, 110, 250));
 
 
-    let mut frame = Frame::new(30, 80, 100, 40, "0");
-    let mut but_inc = Button::new(30, 40, 100, 40, "+");
-    let mut but_dec = Button::new(30, 120, 100, 40, "-");
 
     wind.end();
     wind.show();
 
     let (s, r) = app::channel::<Message>();
 
-    but_inc.emit(s, Message::Increment);
-    but_dec.emit(s, Message::Decrement);
+    but_p.emit(s, Message::Increment);
+    but_p2.emit(s, Message::Decrement);
+    but_p3.emit(s, Message::Decrement);
+    //but_p3.emit(s, Message::Decrement);
 
-    but.set_frame(FrameType::RoundUpBox);
-    but.set_callback(Box::new(move || {
-        let mut option = &newW(&mut pokemon1);
-    }));
 
-    but2.set_callback(Box::new(move || {
-        let mut option = &newW(&mut pokemon2);
-    }));
 
-    but3.set_callback(Box::new(move || {
-        let mut option = &newW(&mut pokemon3);
-    }));
+    grp2.end();
 
-    let mut strmut = "Test".to_string();
+    // TAB DE TIENDA
+    let grp3 = Group::new(10, 35, 650 - 30, 400 - 25, "Tienda");
+
+    let mut frame_back = Frame::new(0, 0, 650, 400, "");
+    let mut image_back = SharedImage::load(&PathBuf::from("res/fondos/tienda.png"))?;
+    image_back.scale(650, 400, true, true);
+    frame_back.set_image(&image_back);
+    
+    grp3.end();
+    
+    tab.end();
+
+    wind.make_resizable(false);
+    wind.end();
+    wind.show();
 
     while app.wait()? {
-        let label: i32 = frame.label().parse()?;
+        let label: i32 = 0;//frame.label().parse()?;
         
         match r.recv() {
-            Some(Message::Increment) => fakeAttack(&mut frame, &mut strmut),
-            Some(Message::Decrement) => fakeAttack(&mut frame, &mut strmut),
+            Some(Message::Increment) => cha(&mut frame_enemy, &mut enemigo),
+            Some(Message::Decrement) => cha(&mut frame_enemy, &mut enemigo),
             None => (),
         }
     }
-
+    
     app.run()?;
     Ok(())
 }
 
-fn newW(fake: &mut Fakemon) {
-
-    new_window(fake);
-}
 
 fn readPokes(input: &str) -> String {
     let paths = fs::read_dir("./res/fakemons/").unwrap();
@@ -403,89 +393,19 @@ fn readPokes(input: &str) -> String {
 
 }
 
-fn new_window(fake : &mut Fakemon) -> Result<(), Box<dyn Error>> {
+fn cha(frame_enemy: &mut Frame, enemigo: &mut Enemigo) {
+    change(frame_enemy, enemigo);
+}
 
-    let condition = true;
+fn change(frame_enemy: &mut Frame, enemigo: &mut Enemigo) -> Result<(), Box<dyn Error>> {
 
-    let mut wind2 = Window ::new(300, 300, 600, 400, "Batalla");
-
-    let mut frame_back = Frame::new(0, -30, 600, 400, "");
-    let mut image_back = SharedImage::load(&PathBuf::from("res/fondos/jungle.jpg"))?;
-    image_back.scale(900, 500, true, true);
-    frame_back.set_image(&image_back);
-
-    let mut frame_you = Frame::new(50, 50, 100, 200, "");
-    let mut image_you = SharedImage::load(&PathBuf::from("res/".to_string() + &fake.imagen.to_string()))?;
-    image_you.scale(200, 200, true, true);
-    frame_you.set_image(&image_you);
-
-    let mut frame_text_box = Frame::new(40, 60, 530, 400, "");
-    let mut image_text_box = SharedImage::load(&PathBuf::from("res/text_box.png"))?;
-    image_text_box.scale(250, 250, true, true);
-    frame_text_box.set_image(&image_text_box);
+    frame_enemy.set_label(&format!("HP: {}",enemigo.hp));
 
     let mut randomEnemy = readPokes("str");
 
-    let mut frame_enemy = Frame::new(50, 50, 900, 200, "");
     let mut image_enemy = SharedImage::load(&PathBuf::from("res/fakemons/".to_string() + &randomEnemy.to_string()))?;
     image_enemy.scale(200, 200, true, true);
     frame_enemy.set_image(&image_enemy);
 
-    // BOTONES DE FAKEMON
-    let mut but_p = Button::new(50, 200, 80, 40, fake.habilidad1.nombre);
-    let mut but_p2 = Button::new(50, 250, 80, 40, fake.habilidad2.nombre);
-    let mut but_p3 = Button::new(50, 300, 80, 40, fake.habilidad3.nombre);
-
-    let mut frame_comment = Frame::new(50, 50, 500, 400, "");
-    let mut frame_comment2 = Frame::new(50, 50, 500, 400, "");
-    let mut frame_comment3 = Frame::new(50, 50, 500, 400, "");
-
-    but_p.set_color(Color::Light1); // You can use one of the provided colors in the fltk enums
-    but_p.set_color(Color::from_rgb(3, 110, 250)); // Or you can specify a color by rgb or hex/u32 value
-    //but_p.set_color(Color::from_u32(0xffebee));
-    but_p.set_frame(FrameType::RoundUpBox);
-
-
-    let mut strmut = "Test".to_string();
-
-    let mut msg1 = "Raikkonen ha usado ".to_string() + fake.habilidad1.nombre;
-    but_p.set_callback(Box::new(move || {
-        //fakeAttack(&mut frame_comment, &mut msg1);
-    } ));
-
-    let mut msg2 = "Raikkonen ha usado ".to_string() + fake.habilidad2.nombre;
-    but_p2.set_callback(Box::new(move || {
-        fakeAttack(&mut frame_comment2, &mut msg2);
-    } ));
-
-    let mut msg3 = "Raikkonen ha usado ".to_string() + fake.habilidad3.nombre;
-    but_p3.set_callback(Box::new(move || {
-        fakeAttack(&mut frame_comment3, &mut msg3);
-    } ));
-
-    //but_p3.set_callback(Box::new(move || frame_comment.set_label("Raikkonen ha usado arañazo")));
-
-    // ENEMIGO
-    let mut enemigo =  Enemigo { 
-
-        nombre : "Stroll",
-        hp : 1000,
-        defn : 3,
-        atk : 4,
-        nivel : 1,
-        velocidad : 3,
-        tipo : "fuego",
-    };
-    
-    wind2.show();
-
-    if condition {
-        return Err(Box::new(MyError("Oops".into())));
-    }
-
     Ok(())
-}
-
-fn fakeAttack(frame : &mut Frame, attack : &mut String) {
-    frame.set_label(attack);
 }
