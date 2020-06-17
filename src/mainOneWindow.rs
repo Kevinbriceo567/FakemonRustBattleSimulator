@@ -280,6 +280,14 @@ fn main() -> Result<(), Box<dyn Error>> {
         descripcion: "Objeto memorable caracteristico de la saga. Se dice que quien lo adquiere obtiene poderes de programador.",
     
     };
+
+    static revivir: Objeto = Objeto {
+
+        nombre: "Revivir",
+        precio: &2000,
+        descripcion: "Permite re animar a un fakemon debilitado cuando su hp esta en 0.",
+    
+    };
     
 
     /*fn comprar(dinero){
