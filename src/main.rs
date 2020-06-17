@@ -43,8 +43,10 @@ impl Error for MyError {}
 struct Habilidad<'a> {
     // The 'a defines a lifetime
     nombre: &'a str,
-    dano: u8,
-    cantidad: u8,
+    dano: i32,
+    cantidad: i32,
+    bajaDefensa: i32,
+    bajaAtaque: i32
 
     //Entre defensa, ataque y velocidad, no pueden exceder lo 10 puntos.
 }
@@ -63,11 +65,11 @@ struct Fakemon<'a> {
     nombre: &'a str,
     codigo: u8,
     hp: i32,
-    defn: u8,
-    atk: u8,
-    nivel: u8,
-    velocidad: u8,
-    experiencia: u8,
+    defn: i32,
+    atk: i32,
+    nivel: i32,
+    velocidad: i32,
+    experiencia: i32,
     tipo: &'a str,
     imagen: &'a str,
     habilidad1: Habilidad<'a>,
@@ -81,10 +83,10 @@ struct Enemigo<'a> {
     // The 'a defines a lifetime
     nombre: &'a str,
     hp: i32,
-    defn: u8,
-    atk: u8,
-    nivel: u8,
-    velocidad: u8,
+    defn: i32,
+    atk: i32,
+    nivel: i32,
+    velocidad: i32,
     tipo: &'a str,
 
     //Entre defensa, ataque y velocidad, no pueden exceder lo 10 puntos.
@@ -135,7 +137,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         nombre:"Latigo",
         dano: 0,
-        cantidad: 10
+        cantidad: 10,
+        bajaDefensa: 1,
+        bajaAtaque: 0
 
     };
 
@@ -144,7 +148,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         nombre:"Gruñido",
         dano: 0,
-        cantidad: 10
+        cantidad: 10,
+        bajaDefensa: 0,
+        bajaAtaque: 1
 
     };
 
@@ -152,7 +158,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         nombre:"Burbuja",
         dano: 10,
-        cantidad: 15
+        cantidad: 15,
+        bajaDefensa: 0,
+        bajaAtaque: 0
 
     };
 
@@ -160,7 +168,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         nombre:"Placaje",
         dano: 5,
-        cantidad: 20
+        cantidad: 20,
+        bajaDefensa: 0,
+        bajaAtaque: 0
 
     };
 
@@ -168,7 +178,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         nombre:"Ascuas",
         dano: 10,
-        cantidad: 20
+        cantidad: 20,
+        bajaDefensa: 0,
+        bajaAtaque: 0
 
     };
 
@@ -176,7 +188,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         nombre:"Corte hoja",
         dano: 15,
-        cantidad: 15
+        cantidad: 15,
+        bajaDefensa: 0,
+        bajaAtaque: 0
 
     };
 
@@ -193,7 +207,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         tipo : "fuego",
         imagen : "vettel.png",
         habilidad1 : latigo,
-        habilidad2 : ascuas,
+        habilidad2 : grunido,
         habilidad3 : placaje
 
     };
@@ -378,9 +392,36 @@ fn main() -> Result<(), Box<dyn Error>> {
         let label: i32 = 0;//frame.label().parse()?;
         
         match r.recv() {
-            Some(Message::Increment) => attack(&mut enemigo, &mut fake, &mut frame_enemy_health_text, &mut frame_fake_health_text, 1),
-            Some(Message::Decrement) => attack(&mut enemigo, &mut fake, &mut frame_enemy_health_text, &mut frame_fake_health_text, 2),
-            Some(Message::Attack3) => attack(&mut enemigo, &mut fake, &mut frame_enemy_health_text, &mut frame_fake_health_text, 3),
+            Some(Message::Increment) => attack(
+                &mut enemigo, 
+                &mut fake, 
+                &mut frame_enemy_health_text, 
+                &mut frame_enemy_def_text, 
+                &mut frame_enemy_atk_text, 
+                &mut frame_fake_health_text, 
+                &mut frame_fake_def_text, 
+                &mut frame_fake_atk_text, 
+                1),
+            Some(Message::Decrement) => attack(
+                &mut enemigo, 
+                &mut fake, 
+                &mut frame_enemy_health_text, 
+                &mut frame_enemy_def_text, 
+                &mut frame_enemy_atk_text, 
+                &mut frame_fake_health_text, 
+                &mut frame_fake_def_text, 
+                &mut frame_fake_atk_text, 
+                2),
+            Some(Message::Attack3) => attack(
+                &mut enemigo, 
+                &mut fake, 
+                &mut frame_enemy_health_text, 
+                &mut frame_enemy_def_text, 
+                &mut frame_enemy_atk_text, 
+                &mut frame_fake_health_text, 
+                &mut frame_fake_def_text, 
+                &mut frame_fake_atk_text, 
+                3),
             None => (),
         }
     }
@@ -419,18 +460,50 @@ fn readPokes(input: &str) -> String {
 }
 
 
-fn attack(enemigo: &mut Enemigo, fakemon: &mut Fakemon, frame_enemy_health_text: &mut Frame, frame_fake_health_text: &mut Frame, num: i32) {
+fn attack(
+    enemigo: &mut Enemigo, 
+    fakemon: &mut Fakemon,
+    frame_enemy_health_text: &mut Frame, 
+    frame_enemy_defn_text: &mut Frame, 
+    frame_enemy_atk_text: &mut Frame, 
+    frame_fake_health_text: &mut Frame, 
+    frame_fake_defn_text: &mut Frame, 
+    frame_fake_atk_text: &mut Frame, 
+    num: i32) 
+
+{
     
+    let mut newHabilidad = &fakemon.habilidad1;
 
     if num == 1 {
-        frame_enemy_health_text.set_label("ME ATACAN 1");
+        newHabilidad = &fakemon.habilidad1;
     }
     else if num == 2 {
-        frame_enemy_health_text.set_label("ME ATACAN 2");
+        newHabilidad = &fakemon.habilidad2;
     }
     else {
-        frame_enemy_health_text.set_label("ME ATACAN 3");
+        newHabilidad = &fakemon.habilidad3;
     }
+
+    if newHabilidad.dano > 0 {
+        let mut dano : i32 = (newHabilidad.dano * fakemon.atk) - enemigo.defn;
+        let mut nuevoHpEnemigo : i32 = enemigo.hp - dano;
+        frame_enemy_health_text.set_label(&format!("{}",nuevoHpEnemigo));
+        enemigo.hp = nuevoHpEnemigo;
+    }
+
+    if newHabilidad.bajaDefensa > 0 {
+        let mut nuevoDefEnemigo : i32 = enemigo.defn - newHabilidad.bajaDefensa;
+        frame_enemy_defn_text.set_label(&format!("{}",nuevoDefEnemigo));
+        enemigo.defn = nuevoDefEnemigo;
+    }
+
+    if newHabilidad.bajaAtaque > 0 {
+        let mut nuevoAtkEnemigo : i32 = enemigo.atk - newHabilidad.bajaAtaque;
+        frame_enemy_atk_text.set_label(&format!("{}",nuevoAtkEnemigo));
+        enemigo.atk = nuevoAtkEnemigo;
+    }
+    
 
 }
 
