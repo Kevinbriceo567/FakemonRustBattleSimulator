@@ -103,7 +103,13 @@ struct Entrenador<'a> {
     sexo: &'a str
 }
 
+struct Objeto<'a> {
 
+    nombre: &'a str,
+    precio: &'a u32,
+    descripcion: &'a str,
+
+}
 
 static entrenadorPlayer: Entrenador = Entrenador {
     nombre: "Chelox",
@@ -222,6 +228,48 @@ fn main() -> Result<(), Box<dyn Error>> {
         nivel : 1,
         velocidad : 3,
         tipo : "fuego",
+    };
+
+    // OBJETOS
+
+    let mut pocion = Objeto {
+
+        nombre: "Pocion",
+        precio: &500,
+        descripcion: "Pocion comun que restaura 500 puntos de HP del fakemon.",
+    
+    };
+    
+    let mut super_pocion = Objeto {
+    
+        nombre: "Super Pocion",
+        precio: &700,
+        descripcion: "Pocion nivel 2 que restaura 800 puntos de HP del fakemon.",
+    
+    };
+    
+    let mut hiper_pocion = Objeto {
+    
+        nombre: "Hiper Pocion",
+        precio: &1000,
+        descripcion: "Pocion nivel 3 que restaura 1000 puntos de HP del fakemon.",
+    
+    };
+    
+    let mut fakeball = Objeto {
+    
+        nombre: "Fakeball",
+        precio: &1500,
+        descripcion: "Objeto memorable caracteristico de la saga. Se dice que quien lo adquiere obtiene poderes de programador.",
+    
+    };
+
+    let mut revivir = Objeto {
+    
+        nombre: "Revivir",
+        precio: &2000,
+        descripcion: "Permite re animar al fakemon caído en batalla.",
+    
     };
 
     let tab = Tabs::new(0, 0, 650 - 20, 420 - 20, "");
@@ -365,6 +413,41 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut frame_back = Frame::new(-20, 0, 660, 400, "");
     let mut image_back = SharedImage::load(&PathBuf::from("res/fondos/tienda.png"))?;
     image_back.scale(660, 400, true, true);
+    frame_back.set_image(&image_back);
+
+    //BOTONES DE LA TIENDA
+
+    let mut _pocion = Button::new(30, 180, 140, 40, "Comprar");
+    let mut d_pocion = Frame::new(50, -5, 100, 300, &format!("{}",pocion.nombre));
+    let mut p_pocion = Frame::new(50, 15, 100, 300, &format!("Precio: {}",pocion.precio));
+    _pocion.set_color(Color::from_rgb(245, 235, 15));
+    _pocion.set_frame(FrameType::RoundUpBox);
+
+    let mut _super_pocion = Button::new(250, 180, 140, 40, "Comprar");
+    let mut d_super_pocion = Frame::new(270, -1, 100, 300, &format!("{}",super_pocion.nombre));
+    let mut p_super_pocion = Frame::new(270, 17, 100, 300, &format!("Precio: {}",super_pocion.precio));
+    _super_pocion.set_color(Color::from_rgb(245, 235, 15));
+    _super_pocion.set_frame(FrameType::RoundUpBox);
+
+    let mut _hiper_pocion = Button::new(470, 180, 140, 40, "Comprar");
+    let mut d_hiper_pocion = Frame::new(490, -1, 100, 300, &format!("{}",hiper_pocion.nombre));
+    let mut p_hiper_pocion = Frame::new(490, 17, 100, 300, &format!("Precio: {}",hiper_pocion.precio));
+    _hiper_pocion.set_color(Color::from_rgb(245, 235, 15));
+    _hiper_pocion.set_frame(FrameType::RoundUpBox);
+
+    let mut _fakebola = Button::new(110, 345, 140, 40, "Comprar");
+    let mut d_fakebola = Frame::new(130, 185, 100, 300, &format!("{}",fakeball.nombre));
+    let mut p_fakebola = Frame::new(130, 165, 100, 300, &format!("Precio: {}",fakeball.precio));
+    _fakebola.set_color(Color::from_rgb(245, 235, 15));
+    _fakebola.set_frame(FrameType::RoundUpBox);
+
+    let mut _revivir = Button::new(390, 342, 140, 40, "Comprar");
+    let mut d_revivir = Frame::new(410, 180, 100, 300, &format!("{}",revivir.nombre));
+    let mut p_revivir = Frame::new(410, 160, 100, 300, &format!("Precio: {}",revivir.precio));
+    _revivir.set_color(Color::from_rgb(245, 235, 15));
+    _revivir.set_frame(FrameType::RoundUpBox);
+
+    image_back.scale(650, 400, true, true);
     frame_back.set_image(&image_back);
 
     grp3.end();
